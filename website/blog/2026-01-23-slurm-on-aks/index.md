@@ -604,12 +604,6 @@ slinky       up   infinite      2   idle slinky-[0-1]
 all*         up   infinite      2   idle slinky-[0-1]
 ```
 
-Check nodes:
-
-```bash
-sinfo -N -l
-```
-
 ## Step 9: Submitting your first job
 
 ### Simple job example

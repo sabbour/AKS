@@ -646,7 +646,6 @@ cat /home/test-output-*.txt
 Expected output:
 
 ```text
-root@slurm-login-slinky-9d79c9c95-84fkd:/tmp# cat /home/test-output-*.txt
 Hello from Slurm on AKS with Slinky!
 Job ID: 1
 Running on node: slinky-0
@@ -744,15 +743,9 @@ GPU 1: Tesla V100-PCIE-16GB (UUID: GPU-e5f6g7h8-...)
 
 > **Note**: The output from multiple nodes is interleaved since `srun` streams output from all nodes together. The `SLURM_PROCID` values (0 and 1) confirm the job ran on both nodes.
 
-## Distributed training with PyTorch
-
-For distributed AI training across multiple GPU nodes, you need a custom slurmd image with ML frameworks installed. The standard pattern uses `srun` with `torchrun` to coordinate training across all nodes in a Slurm allocation.
-
 ## Scaling NodeSets with Node Auto Provisioning
 
 With NAP configured, scaling Slurm NodeSets is seamless. When you increase replicas, NAP automatically provisions new GPU nodes to run the additional worker pods.
-
-### Scale NodeSets
 
 Scale using kubectl:
 
@@ -768,43 +761,6 @@ helm upgrade slurm oci://ghcr.io/slinkyproject/charts/slurm \
   --namespace slurm \
   --values slurm-values.yaml \
   --set nodesets.slinky.replicas=4
-```
-
-### How NAP handles scaling
-
-When you scale up:
-
-1. Slinky creates new Slurm worker pods
-2. NAP detects pending pods with tolerations matching the NodePool taints
-3. NAP provisions new nodes from the appropriate SKU family (D/E/F for CPU, NC/ND/NV for GPU)
-4. Pods are scheduled on the new nodes
-5. Slurm configuration is automatically updated
-
-When you scale down:
-
-1. The Slinky operator drains Slurm nodes (waits for running jobs to complete)
-2. Worker pods are terminated
-3. NAP consolidates underutilized nodes based on the `consolidationPolicy`
-4. Empty nodes are automatically deprovisioned after the `consolidateAfter` period
-
-### Monitor node provisioning
-
-Watch NAP provision nodes in real-time:
-
-```bash
-kubectl get nodes -w
-```
-
-Check NodePool status:
-
-```bash
-kubectl get nodepools
-```
-
-View Karpenter events:
-
-```bash
-kubectl get events --field-selector source=karpenter -A
 ```
 
 ## Limitations

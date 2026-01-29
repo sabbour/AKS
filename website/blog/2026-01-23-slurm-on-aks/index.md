@@ -138,6 +138,8 @@ aks-nodepool1-12345678-vmss000002   Ready    <none>   3m      v1.33.5
 
 Node Auto Provisioning (NAP) uses Karpenter to automatically provision GPU nodes for your Slurm workloads.
 
+> **Tip**: To target specific GPU types, add `karpenter.azure.com/sku-gpu-name` with values like `A100`, `H100`, or `T4`. See the [NAP documentation](https://learn.microsoft.com/azure/aks/node-auto-provisioning-node-pools) for all available selectors.
+
 ### Create NodePool for GPU workers
 
 ```bash
@@ -184,8 +186,6 @@ spec:
   osDiskSizeGB: 256
 EOF
 ```
-
-> **Tip**: To target specific GPU types, add `karpenter.azure.com/sku-gpu-name` with values like `A100`, `H100`, or `T4`. See the [NAP documentation](https://learn.microsoft.com/azure/aks/node-auto-provisioning-node-pools) for all available selectors.
 
 ### Install the NVIDIA device plugin
 
@@ -384,6 +384,8 @@ echo "MySQL host: $MYSQL_FQDN"
 ## Step 5: Set up shared storage
 
 Create an Azure Files share for user home directories:
+
+> **Tip**: For higher performance workloads, consider using [Azure Managed Lustre](https://learn.microsoft.com/azure/azure-managed-lustre/amlfs-overview) with the [CSI driver for AKS](https://learn.microsoft.com/azure/azure-managed-lustre/use-csi-driver-kubernetes) instead of Azure Files.
 
 ```bash
 # Create storage account

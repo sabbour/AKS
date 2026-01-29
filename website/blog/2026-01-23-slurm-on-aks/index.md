@@ -40,7 +40,7 @@ The Slinky deployment on AKS consists of several components:
 - **Slurm Operator**: Runs in the `slinky` namespace and manages all Slurm components
 - **Slurm Controller (slurmctld)**: Schedules jobs and manages cluster state
 - **Slurm Database Daemon (slurmdbd)**: Handles job accounting and connects to the database
-- **Database**: Azure Database for MySQL flexible server for job accounting
+- **Database**: MySQL deployed in-cluster for job accounting
 - **NodeSets**: Worker nodes (`slurmd`) that execute jobs, including GPU-enabled nodes
 - **LoginSets**: Entry points for users to submit jobs via SSH
 - **Shared storage**: Azure Files for user home directories

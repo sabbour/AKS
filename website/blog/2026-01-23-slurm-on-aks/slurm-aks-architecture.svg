@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 580">
+  <defs>
+    <linearGradient id="aksGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00BCF2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="slurmGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9f62eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b388ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="operatorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6a1b9a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9c27b0;stop-opacity:1" />
+    </linearGradient>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="950" height="580" fill="#f5f5f5"/>
+  
+  <!-- Title -->
+  <text x="475" y="35" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="bold" fill="#333" text-anchor="middle">Slurm on AKS with Slinky and Node Auto Provisioning</text>
+  
+  <!-- AKS Cluster Box -->
+  <rect x="30" y="55" width="890" height="480" rx="10" ry="10" fill="white" stroke="#0078D4" stroke-width="3"/>
+  <text x="475" y="80" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="bold" fill="#0078D4" text-anchor="middle">AKS Cluster with Node Auto Provisioning (NAP)</text>
+  
+  <!-- Slinky Operator Section -->
+  <rect x="50" y="95" width="170" height="70" rx="8" ry="8" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2"/>
+  <text x="135" y="118" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#6a1b9a" text-anchor="middle">slinky namespace</text>
+  <rect x="60" y="128" width="150" height="30" rx="5" ry="5" fill="url(#operatorGradient)" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="135" y="148" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="white" text-anchor="middle">Slinky Operator</text>
+  
+  <!-- Slurm Namespace Section -->
+  <rect x="240" y="95" width="660" height="200" rx="8" ry="8" fill="#ede7f6" stroke="#9c27b0" stroke-width="2"/>
+  <text x="570" y="118" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold" fill="#6a1b9a" text-anchor="middle">slurm namespace</text>
+  
+  <!-- Control Plane Components -->
+  <rect x="255" y="130" width="280" height="150" rx="6" ry="6" fill="#e3f2fd" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="395" y="148" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#0078D4" text-anchor="middle">Slurm Control Plane</text>
+  
+  <!-- slurmctld -->
+  <rect x="265" y="158" width="80" height="50" rx="5" ry="5" fill="url(#slurmGradient)" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="305" y="180" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">slurmctld</text>
+  <text x="305" y="195" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Controller</text>
+  
+  <!-- slurmdbd -->
+  <rect x="355" y="158" width="80" height="50" rx="5" ry="5" fill="url(#slurmGradient)" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="395" y="180" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">slurmdbd</text>
+  <text x="395" y="195" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Accounting</text>
+  
+  <!-- MySQL -->
+  <rect x="445" y="158" width="80" height="50" rx="5" ry="5" fill="#ff9800" stroke="#e65100" stroke-width="2"/>
+  <text x="485" y="180" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">MySQL</text>
+  <text x="485" y="195" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Job History</text>
+  
+  <!-- Login Pod -->
+  <rect x="280" y="220" width="100" height="45" rx="5" ry="5" fill="#4caf50" stroke="#2e7d32" stroke-width="2"/>
+  <text x="330" y="240" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">LoginSet</text>
+  <text x="330" y="255" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">sbatch / srun</text>
+  
+  <!-- REST API -->
+  <rect x="395" y="220" width="100" height="45" rx="5" ry="5" fill="url(#slurmGradient)" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="445" y="240" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">slurmrestd</text>
+  <text x="445" y="255" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">REST API</text>
+  
+  <!-- Worker Section (NodeSet) -->
+  <rect x="550" y="130" width="340" height="150" rx="6" ry="6" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="720" y="148" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#e65100" text-anchor="middle">NodeSet: GPU Workers (NAP provisioned)</text>
+  
+  <!-- slurmd pods -->
+  <rect x="565" y="158" width="95" height="55" rx="5" ry="5" fill="url(#slurmGradient)" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="612" y="178" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">slurmd-0</text>
+  <text x="612" y="193" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">nvidia.com/gpu: 1</text>
+  <text x="612" y="205" font-family="Segoe UI, Arial, sans-serif" font-size="7" fill="#e1bee7" text-anchor="middle">NC-series VM</text>
+  
+  <rect x="670" y="158" width="95" height="55" rx="5" ry="5" fill="url(#slurmGradient)" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="717" y="178" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">slurmd-1</text>
+  <text x="717" y="193" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">nvidia.com/gpu: 1</text>
+  <text x="717" y="205" font-family="Segoe UI, Arial, sans-serif" font-size="7" fill="#e1bee7" text-anchor="middle">NC-series VM</text>
+  
+  <rect x="775" y="158" width="95" height="55" rx="5" ry="5" fill="url(#slurmGradient)" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="822" y="178" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">slurmd-N</text>
+  <text x="822" y="193" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">nvidia.com/gpu: 1</text>
+  <text x="822" y="205" font-family="Segoe UI, Arial, sans-serif" font-size="7" fill="#e1bee7" text-anchor="middle">NC-series VM</text>
+  
+  <!-- NVIDIA Device Plugin -->
+  <rect x="620" y="225" width="180" height="35" rx="5" ry="5" fill="#76b900" stroke="#5a8f00" stroke-width="2"/>
+  <text x="710" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">NVIDIA Device Plugin</text>
+  
+  <!-- NAP / Karpenter Section -->
+  <rect x="50" y="310" width="350" height="90" rx="8" ry="8" fill="#e1f5fe" stroke="#03a9f4" stroke-width="2"/>
+  <text x="225" y="332" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold" fill="#0277bd" text-anchor="middle">Node Auto Provisioning (Karpenter)</text>
+  
+  <!-- NodePools -->
+  <rect x="70" y="345" width="130" height="45" rx="5" ry="5" fill="url(#aksGradient)" stroke="#0078D4" stroke-width="2"/>
+  <text x="135" y="365" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">NodePool</text>
+  <text x="135" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">slurm-gpu</text>
+  
+  <rect x="215" y="345" width="165" height="45" rx="5" ry="5" fill="#b0bec5" stroke="#78909c" stroke-width="2"/>
+  <text x="297" y="365" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">AKSNodeClass</text>
+  <text x="297" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">slurm-gpu (Azure Linux)</text>
+  
+  <!-- Storage Section -->
+  <rect x="420" y="310" width="490" height="90" rx="8" ry="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="665" y="332" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold" fill="#2e7d32" text-anchor="middle">Persistent Storage &amp; Images</text>
+  
+  <!-- Azure Files -->
+  <rect x="435" y="345" width="125" height="45" rx="5" ry="5" fill="url(#aksGradient)" stroke="#0078D4" stroke-width="2"/>
+  <text x="497" y="365" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Azure Files</text>
+  <text x="497" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">/home (shared)</text>
+  
+  <!-- Managed Disks -->
+  <rect x="570" y="345" width="125" height="45" rx="5" ry="5" fill="url(#aksGradient)" stroke="#0078D4" stroke-width="2"/>
+  <text x="632" y="365" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Managed Disk</text>
+  <text x="632" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Controller State</text>
+  
+  <!-- Azure Container Registry -->
+  <rect x="705" y="345" width="190" height="45" rx="5" ry="5" fill="url(#aksGradient)" stroke="#0078D4" stroke-width="2"/>
+  <text x="800" y="365" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Azure Container Registry</text>
+  <text x="800" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Custom Slurm Images</text>
+  
+  <!-- External Access Section -->
+  <rect x="50" y="415" width="200" height="105" rx="8" ry="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="150" y="438" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold" fill="#c2185b" text-anchor="middle">External Access</text>
+  
+  <!-- User -->
+  <rect x="70" y="450" width="75" height="55" rx="5" ry="5" fill="#e91e63" stroke="#c2185b" stroke-width="2"/>
+  <text x="107" y="475" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Users</text>
+  <text x="107" y="490" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">SSH / kubectl</text>
+  
+  <!-- LoadBalancer -->
+  <rect x="160" y="450" width="75" height="55" rx="5" ry="5" fill="url(#aksGradient)" stroke="#0078D4" stroke-width="2"/>
+  <text x="197" y="475" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">LB</text>
+  <text x="197" y="490" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Public IP</text>
+  
+  <!-- Arrows with labels -->
+  <!-- Operator manages Slurm components -->
+  <line x1="210" y1="143" x2="240" y2="143" stroke="#9c27b0" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="225" y="138" font-family="Segoe UI, Arial, sans-serif" font-size="7" fill="#6a1b9a" text-anchor="middle">manages</text>
+  
+  <!-- slurmctld to slurmdbd -->
+  <line x1="345" y1="183" x2="355" y2="183" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- slurmdbd to MySQL -->
+  <line x1="435" y1="183" x2="445" y2="183" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- slurmctld to workers -->
+  <line x1="520" y1="183" x2="550" y2="183" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="535" y="178" font-family="Segoe UI, Arial, sans-serif" font-size="7" fill="#666" text-anchor="middle">jobs</text>
+  
+  <!-- User to LoadBalancer -->
+  <line x1="145" y1="477" x2="160" y2="477" stroke="#666" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- LoadBalancer to Login -->
+  <line x1="197" y1="450" x2="270" y2="265" stroke="#666" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrowhead)"/>
+  
+  <!-- NAP provisions workers -->
+  <path d="M 200 345 Q 200 305 612 280" fill="none" stroke="#03a9f4" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrowhead)"/>
+  <text x="380" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="#0277bd" text-anchor="middle">provisions GPU nodes</text>
+  
+  <!-- Legend -->
+  <rect x="280" y="425" width="630" height="95" rx="5" ry="5" fill="white" stroke="#ccc" stroke-width="1"/>
+  <text x="595" y="442" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#333" text-anchor="middle">Legend</text>
+  
+  <rect x="295" y="455" width="14" height="14" fill="url(#slurmGradient)"/>
+  <text x="315" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Slurm Components</text>
+  
+  <rect x="295" y="478" width="14" height="14" fill="url(#operatorGradient)"/>
+  <text x="315" y="489" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Slinky Operator</text>
+  
+  <rect x="295" y="501" width="14" height="14" fill="url(#aksGradient)"/>
+  <text x="315" y="512" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Azure Services</text>
+  
+  <rect x="445" y="455" width="14" height="14" fill="#ff9800"/>
+  <text x="465" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Database</text>
+  
+  <rect x="445" y="478" width="14" height="14" fill="#4caf50"/>
+  <text x="465" y="489" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">User Entry Points</text>
+  
+  <rect x="445" y="501" width="14" height="14" fill="#76b900"/>
+  <text x="465" y="512" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">NVIDIA Components</text>
+  
+  <rect x="595" y="455" width="14" height="14" fill="#03a9f4"/>
+  <text x="615" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Node Auto Provisioning</text>
+  
+  <rect x="595" y="478" width="14" height="14" fill="url(#aksGradient)"/>
+  <text x="615" y="489" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Container Registry (ACR)</text>
+  
+  <line x1="745" y1="462" x2="775" y2="462" stroke="#666" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="795" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Dynamic provisioning</text>
+  
+  <line x1="745" y1="485" x2="775" y2="485" stroke="#666" stroke-width="1.5"/>
+  <text x="795" y="489" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#333">Component communication</text>
+</svg>

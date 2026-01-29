@@ -190,7 +190,17 @@ kube-fleet:
 kueue:
   label: Kueue
   permalink: /kueue
-  description: Kueue workload queueing and scheduling for batch AI/ML jobs on AK
+  description: Kueue workload queueing and scheduling for batch AI/ML jobs on AKS.
+
+hpc:
+  label: HPC
+  permalink: /hpc
+  description: High performance computing workloads, Slurm, MPI, and scientific computing on AKS.
+
+slurm:
+  label: Slurm
+  permalink: /slurm
+  description: Slurm workload manager for HPC and AI/ML batch job scheduling on AKS.
 
 kro:
   label: KRO
@@ -237,6 +247,11 @@ networking:
   permalink: /networking
   description: Cluster and application networking, eBPF, traffic management, and connectivity patterns.
 
+node-autoprovisioning:
+  label: Node Auto Provisioning
+  permalink: /node-autoprovisioning
+  description: Node Auto Provisioning (NAP) for automatic just-in-time node scaling based on workload requirements.
+
 observability:
   label: Observability
   permalink: /observability
@@ -276,6 +291,11 @@ security:
   label: Security
   permalink: /security
   description: Securing clusters, workloads, supply chain, identities, and network boundaries in AKS.
+
+slinky:
+  label: Slinky
+  permalink: /slinky
+  description: Slinky operator for running Slurm natively on Kubernetes clusters.
 
 spot:
   label: Spot

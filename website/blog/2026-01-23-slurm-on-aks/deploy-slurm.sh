@@ -122,25 +122,9 @@ kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/main
 echo "  ✓ NVIDIA device plugin installed"
 
 # -----------------------------------------------------------------------------
-# Step 3: Install cert-manager
+# Step 3: Install Slinky Operator
 # -----------------------------------------------------------------------------
-echo "Step 3: Installing cert-manager..."
-
-helm repo add jetstack https://charts.jetstack.io --force-update
-helm repo update jetstack
-
-helm upgrade --install cert-manager jetstack/cert-manager \
-  --set 'crds.enabled=true' \
-  --namespace cert-manager \
-  --create-namespace \
-  --wait
-
-echo "  ✓ cert-manager installed"
-
-# -----------------------------------------------------------------------------
-# Step 4: Install Slinky Operator
-# -----------------------------------------------------------------------------
-echo "Step 4: Installing Slinky operator..."
+echo "Step 3: Installing Slinky operator..."
 
 helm upgrade --install slurm-operator-crds \
   oci://ghcr.io/slinkyproject/charts/slurm-operator-crds \
@@ -148,6 +132,7 @@ helm upgrade --install slurm-operator-crds \
 
 helm upgrade --install slurm-operator \
   oci://ghcr.io/slinkyproject/charts/slurm-operator \
+  --set 'certManager.enabled=false' \
   --namespace slinky \
   --create-namespace \
   --wait
@@ -155,9 +140,9 @@ helm upgrade --install slurm-operator \
 echo "  ✓ Slinky operator installed"
 
 # -----------------------------------------------------------------------------
-# Step 5: Deploy MySQL for job accounting
+# Step 4: Deploy MySQL for job accounting
 # -----------------------------------------------------------------------------
-echo "Step 5: Deploying MySQL in the cluster..."
+echo "Step 4: Deploying MySQL in the cluster..."
 
 # Set MySQL credentials
 export MYSQL_ADMIN_USER="slurmadmin"
@@ -265,9 +250,9 @@ echo "  MySQL host: $MYSQL_FQDN"
 echo "  ✓ MySQL deployed in cluster"
 
 # -----------------------------------------------------------------------------
-# Step 6: Set up shared storage
+# Step 5: Set up shared storage
 # -----------------------------------------------------------------------------
-echo "Step 6: Setting up shared storage..."
+echo "Step 5: Setting up shared storage..."
 
 kubectl create namespace slurm --dry-run=client -o yaml | kubectl apply -f -
 
@@ -299,9 +284,9 @@ kubectl create secret generic azure-storage-secret \
 echo "  ✓ Shared storage configured"
 
 # -----------------------------------------------------------------------------
-# Step 7: Deploy Slurm cluster
+# Step 6: Deploy Slurm cluster
 # -----------------------------------------------------------------------------
-echo "Step 7: Deploying Slurm cluster..."
+echo "Step 6: Deploying Slurm cluster..."
 
 # Create MySQL password secret
 kubectl create secret generic slurm-db-secret \
@@ -422,9 +407,9 @@ helm upgrade --install slurm oci://ghcr.io/slinkyproject/charts/slurm \
 echo "  ✓ Slurm cluster deployed"
 
 # -----------------------------------------------------------------------------
-# Step 8: Verify deployment
+# Step 7: Verify deployment
 # -----------------------------------------------------------------------------
-echo "Step 8: Verifying deployment..."
+echo "Step 7: Verifying deployment..."
 
 echo "  Waiting for pods to be ready..."
 kubectl wait --for=condition=Ready pods --all -n slurm --timeout=300s || true
@@ -434,10 +419,10 @@ echo "  Pod status:"
 kubectl get pods -n slurm
 
 # -----------------------------------------------------------------------------
-# Step 9: Get connection info
+# Step 8: Get connection info
 # -----------------------------------------------------------------------------
 echo ""
-echo "Step 9: Connection information"
+echo "Step 8: Connection information"
 echo "=========================================="
 
 # Wait for LoadBalancer IP

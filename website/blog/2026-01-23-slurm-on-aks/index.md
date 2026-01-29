@@ -227,49 +227,19 @@ system-surge   system-surge   0       True    6m
 
 > **Note**: NAP creates `default` and `system-surge` NodePools automatically. Nodes show as 0 initially because NAP provisions nodes on-demand when pods request them.
 
-## Step 3: Install cert-manager
+## Step 3: Install the Slinky operator
 
-The Slinky operator uses [Kubernetes admission webhooks](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) to validate and mutate Slurm custom resources. These webhooks require TLS certificates for secure communication with the Kubernetes API server.
-
-[cert-manager](https://cert-manager.io/) automates the creation, renewal, and management of these TLS certificates. Without cert-manager, you would need to manually generate and rotate certificates for the Slinky webhook endpoints.
-
-```bash
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-
-helm install cert-manager jetstack/cert-manager \
-  --set 'crds.enabled=true' \
-  --namespace cert-manager \
-  --create-namespace
-```
-
-Verify cert-manager is running:
-
-```bash
-kubectl get pods -n cert-manager
-```
-
-Expected output:
-
-```text
-NAME                                       READY   STATUS    RESTARTS   AGE
-cert-manager-5c6866597-zrnbq               1/1     Running   0          1m
-cert-manager-cainjector-577f6d9fd7-lnkhm   1/1     Running   0          1m
-cert-manager-webhook-787858fcdb-nlzsq      1/1     Running   0          1m
-```
-
-## Step 4: Install the Slinky operator
-
-Install the Slinky operator CRDs and the operator itself:
+Install the Slinky operator CRDs and the operator itself. The `certManager.enabled=false` flag tells the operator to manage its own webhook certificates instead of relying on cert-manager:
 
 ```bash
 # Install CRDs
 helm install slurm-operator-crds \
   oci://ghcr.io/slinkyproject/charts/slurm-operator-crds
 
-# Install the operator
+# Install the operator without cert-manager
 helm install slurm-operator \
   oci://ghcr.io/slinkyproject/charts/slurm-operator \
+  --set 'certManager.enabled=false' \
   --namespace slinky \
   --create-namespace
 ```
@@ -288,7 +258,7 @@ slurm-operator-5d86d75979-6wflf           1/1     Running   0          1m
 slurm-operator-webhook-567c84547b-kr7zq   1/1     Running   0          1m
 ```
 
-## Step 5: Deploy MySQL for job accounting
+## Step 4: Deploy MySQL for job accounting
 
 Slurm uses a database for job accounting, which enables tracking job history, resource usage, and generating reports. For this guide, we deploy MySQL as a container in the cluster for simplicity.
 
@@ -411,7 +381,7 @@ export MYSQL_FQDN="mysql.slurm.svc.cluster.local"
 echo "MySQL host: $MYSQL_FQDN"
 ```
 
-## Step 6: Set up shared storage
+## Step 5: Set up shared storage
 
 Create an Azure Files share for user home directories:
 
@@ -443,7 +413,7 @@ kubectl create secret generic azure-storage-secret \
   --from-literal=azurestorageaccountkey=$STORAGE_KEY
 ```
 
-## Step 7: Deploy the Slurm cluster with Slinky
+## Step 6: Deploy the Slurm cluster with Slinky
 
 First, create a Kubernetes secret containing the MySQL password:
 

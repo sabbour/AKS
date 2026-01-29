@@ -786,8 +786,5 @@ rm -f mysql-password.txt slurm-values.yaml
 ## Next steps
 
 - Explore the [Slinky documentation](https://slinky.schedmd.com/) for advanced configuration
-- Learn about [Slurm Bridge](https://github.com/SlinkyProject/slurm-bridge) for using Slurm as a Kubernetes scheduler
-- Review the [Slinky Helm chart values](https://github.com/SlinkyProject/slurm-operator/blob/main/helm/slurm/values.yaml) for all configuration options
 - Learn more about [Node Auto Provisioning on AKS](https://learn.microsoft.com/azure/aks/node-autoprovision)
-- Explore [KAITO for AI model inference on AKS](https://learn.microsoft.com/azure/aks/ai-toolchain-operator)
 - Check out [Azure CycleCloud](https://learn.microsoft.com/azure/cyclecloud/overview) for advanced HPC scenarios

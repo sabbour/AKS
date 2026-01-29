@@ -546,7 +546,7 @@ helm install slurm oci://ghcr.io/slinkyproject/charts/slurm \
   --values slurm-values.yaml
 ```
 
-## Step 8: Verify the deployment
+## Step 7: Verify the deployment
 
 After deploying, NAP automatically provisions nodes to run the Slurm worker pods. Check that all pods are running:
 
@@ -576,7 +576,7 @@ SLURM_LOGIN_IP=$(kubectl get services -n slurm slurm-login-slinky \
 echo "Login IP: $SLURM_LOGIN_IP"
 ```
 
-## Step 9: Connect and verify Slurm
+## Step 8: Connect and verify Slurm
 
 You can connect to the login pod directly:
 
@@ -610,7 +610,9 @@ Check nodes:
 sinfo -N -l
 ```
 
-## Submitting your first job
+## Step 9: Submitting your first job
+
+### Simple job example
 
 Create a simple test job to verify the cluster is working:
 
@@ -684,7 +686,7 @@ Thu Jan 29 05:13:12 2026
 +-----------------------------------------------------------------------------------------+
 ```
 
-## Multi-node job example
+### Multi-node job example
 
 To verify multi-node job execution across your Slurm cluster, create a job that runs on multiple nodes:
 

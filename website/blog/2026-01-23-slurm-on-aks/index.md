@@ -92,7 +92,7 @@ AKS_SUBNET_ID=$(az network vnet subnet show \
   --query id -o tsv)
 ```
 
-Create an AKS cluster with Node Auto Provisioning (NAP) and Workload Identity enabled:
+Create an AKS cluster with Node Auto Provisioning (NAP):
 
 ```bash
 az aks create \

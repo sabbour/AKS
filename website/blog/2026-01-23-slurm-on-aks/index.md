@@ -51,10 +51,39 @@ The Slinky deployment on AKS consists of several components:
 
 Before you begin, ensure you have:
 
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) version 2.61.0 or later
+- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) version 2.72.2 or later
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) configured to access your cluster
 - [Helm](https://helm.sh/docs/intro/install/) version 3 or later
 - An Azure subscription with sufficient quota for GPU VMs (NC, ND, or NV series)
+
+### Enable the Managed GPU nodes preview
+
+This guide uses [AKS Managed GPU nodes (preview)](https://learn.microsoft.com/azure/aks/aks-managed-gpu-nodes), which automatically installs the NVIDIA GPU driver, device plugin, and DCGM metrics exporter on GPU nodes. This eliminates the need to manually install and maintain these components.
+
+Install the `aks-preview` CLI extension:
+
+```bash
+az extension add --name aks-preview
+az extension update --name aks-preview
+```
+
+Register the `ManagedGPUExperiencePreview` feature flag in your subscription:
+
+```bash
+az feature register --namespace Microsoft.ContainerService --name ManagedGPUExperiencePreview
+```
+
+Wait for the feature to register (this may take a few minutes):
+
+```bash
+az feature show --namespace Microsoft.ContainerService --name ManagedGPUExperiencePreview --query "properties.state" -o tsv
+```
+
+Once registered, refresh the registration:
+
+```bash
+az provider register --namespace Microsoft.ContainerService
+```
 
 ## Step 1: Create the AKS cluster
 
@@ -63,33 +92,13 @@ Set the following environment variables for use throughout this guide:
 ```bash
 export RESOURCE_GROUP="aks-slurm-rg"
 export CLUSTER_NAME="aks-slurm-cluster"
-export LOCATION="swedencentral"
-export VNET_NAME="aks-slurm-vnet"
+export LOCATION="uksouth"
 ```
 
 Create a resource group:
 
 ```bash
 az group create --name $RESOURCE_GROUP --location $LOCATION
-```
-
-Create a virtual network with a subnet for AKS nodes:
-
-```bash
-# Create VNet
-az network vnet create \
-  --resource-group $RESOURCE_GROUP \
-  --name $VNET_NAME \
-  --address-prefix 10.0.0.0/8 \
-  --subnet-name aks-subnet \
-  --subnet-prefix 10.240.0.0/16
-
-# Get the AKS subnet ID
-AKS_SUBNET_ID=$(az network vnet subnet show \
-  --resource-group $RESOURCE_GROUP \
-  --vnet-name $VNET_NAME \
-  --name aks-subnet \
-  --query id -o tsv)
 ```
 
 Create an AKS cluster with Node Auto Provisioning (NAP):
@@ -102,8 +111,7 @@ az aks create \
   --node-provisioning-mode Auto \
   --network-plugin azure \
   --network-plugin-mode overlay \
-  --network-dataplane cilium \
-  --vnet-subnet-id $AKS_SUBNET_ID
+  --network-dataplane cilium
 ```
 
 This command creates an AKS cluster with:
@@ -184,31 +192,37 @@ metadata:
 spec:
   imageFamily: AzureLinux
   osDiskSizeGB: 256
+  tags:
+    EnabledManagedGPUExperience: "true"
 EOF
 ```
 
-### Install the NVIDIA device plugin
+The `EnabledManagedGPUExperience: "true"` tag enables [AKS Managed GPU nodes](https://learn.microsoft.com/azure/aks/aks-managed-gpu-nodes), which automatically installs the NVIDIA GPU driver, device plugin, and DCGM metrics exporter when GPU nodes are provisioned.
 
-AKS automatically installs NVIDIA GPU drivers on GPU-enabled nodes, but you need to install the [NVIDIA device plugin](https://github.com/NVIDIA/k8s-device-plugin) for Kubernetes to discover and schedule GPUs. The device plugin exposes GPUs as the `nvidia.com/gpu` resource that pods can request.
+### Enable DCGM exporter metrics scraping
 
-```bash
-kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/main/deployments/static/nvidia-device-plugin.yml
-```
-
-Verify the device plugin DaemonSet is created:
+To collect GPU metrics via Azure Monitor, enable the DCGM exporter scrape target:
 
 ```bash
-kubectl get daemonset -n kube-system nvidia-device-plugin-daemonset
+kubectl apply -f - <<EOF
+kind: ConfigMap
+apiVersion: v1
+data:
+  schema-version:
+    v1
+  config-version:
+    ver1
+  default-scrape-settings-enabled: |-
+    dcgmexporter = true
+metadata:
+  name: ama-metrics-settings-configmap
+  namespace: kube-system
+EOF
 ```
 
-Expected output:
+> **Note**: This requires [Azure Monitor managed service for Prometheus](https://learn.microsoft.com/azure/azure-monitor/containers/prometheus-metrics-scrape-default) to be enabled on your cluster.
 
-```text
-NAME                             DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-nvidia-device-plugin-daemonset   0         0         0       0            0           <none>          10s
-```
-
-> **Note**: The DESIRED count shows 0 because no GPU nodes exist yet. When NAP provisions GPU nodes for Slurm worker pods, the device plugin automatically runs on those nodes and exposes the GPUs.
+> **Tip**: To visualize GPU metrics in Azure Managed Grafana, import the [DCGM Exporter Dashboard](https://github.com/NVIDIA/dcgm-exporter/blob/main/grafana/dcgm-exporter-dashboard.json) from the NVIDIA repository.
 
 Verify the NodePools are ready:
 
@@ -443,11 +457,13 @@ accounting:
       name: slurm-db-secret
       key: password
 
-# GPU auto-detection and DCGM integration
+# GPU auto-detection and DCGM job mapping
 configFiles:
   gres.conf: |
     AutoDetect=nvidia
 
+# AKS Managed GPU nodes installs the DCGM exporter automatically.
+# This setting enables GPU-to-job mapping, which labels GPU metrics with Slurm job IDs.
 vendor:
   nvidia:
     dcgm:

@@ -2,18 +2,31 @@
 set -euo pipefail
 
 # =============================================================================
-# Slurm on AKS Deployment Script
-# Deploys Slurm with Slinky operator on Azure Kubernetes Service
-# Uses AKS Managed GPU nodes for automatic GPU driver and device plugin setup
+# Slurm on AKS Automatic Deployment Script
+# Deploys Slurm with Slinky operator on Azure Kubernetes Service Automatic
+# Uses --sku automatic with --enable-hosted-system for managed system node pools
 #
-# PREREQUISITES:
-# - Azure CLI version 2.72.2 or later
-# - aks-preview extension (latest version)
-# - ManagedGPUExperiencePreview feature flag registered
+# PREREQUISITES (preview feature):
+# - Azure CLI version 2.77.0 or later
+# - aks-preview extension version 19.0.0b15 or later
+# - AKS-AutomaticHostedSystemProfilePreview feature flag registered
+#
+# REGION AVAILABILITY:
+# australiacentral, australiaeast, australiasoutheast, brazilsouth,
+# canadacentral, centralindia, centralus, chilecentral, eastasia,
+# francecentral, germanywestcentral, italynorth, japanwest, koreasouth,
+# mexicocentral, newzealandnorth, northeurope, polandcentral, southcentralus,
+# southeastasia, southindia, spaincentral, swedencentral, switzerlandnorth,
+# uksouth, westcentralus, westeurope, westus2, westus3
+#
+# LIMITATIONS:
+# - Windows nodes aren't supported
+# - Istio-based service mesh add-on isn't supported
+# - Custom VNet isn't supported with managed system node pools
 # =============================================================================
 
 echo "=========================================="
-echo "Slurm on AKS Deployment Script"
+echo "Slurm on AKS Automatic Deployment Script"
 echo "=========================================="
 
 # -----------------------------------------------------------------------------
@@ -21,7 +34,7 @@ echo "=========================================="
 # -----------------------------------------------------------------------------
 echo "Checking prerequisites..."
 
-# Check Azure CLI version
+# Check Azure CLI version (requires 2.77.0+)
 AZ_VERSION=$(az version --query '"azure-cli"' -o tsv 2>/dev/null || echo "0.0.0")
 echo "  Azure CLI version: $AZ_VERSION"
 
@@ -30,23 +43,46 @@ echo "  Installing/updating aks-preview extension..."
 az extension add --name aks-preview --allow-preview true 2>/dev/null || \
   az extension update --name aks-preview --allow-preview true 2>/dev/null || true
 
-# Check if ManagedGPUExperiencePreview feature flag is registered
+# Check if AKS-AutomaticHostedSystemProfilePreview feature flag is registered
 FEATURE_STATE=$(az feature show --namespace Microsoft.ContainerService \
-  --name ManagedGPUExperiencePreview \
+  --name AKS-AutomaticHostedSystemProfilePreview \
   --query "properties.state" -o tsv 2>/dev/null || echo "NotRegistered")
 
 if [[ "$FEATURE_STATE" != "Registered" ]]; then
-  echo "  Registering ManagedGPUExperiencePreview feature flag..."
+  echo "  Registering AKS-AutomaticHostedSystemProfilePreview feature flag..."
   az feature register --namespace Microsoft.ContainerService \
-    --name ManagedGPUExperiencePreview --output none
+    --name AKS-AutomaticHostedSystemProfilePreview --output none
   
   echo "  Waiting for feature registration (this may take a few minutes)..."
   while [[ "$FEATURE_STATE" != "Registered" ]]; do
     sleep 30
     FEATURE_STATE=$(az feature show --namespace Microsoft.ContainerService \
-      --name ManagedGPUExperiencePreview \
+      --name AKS-AutomaticHostedSystemProfilePreview \
       --query "properties.state" -o tsv 2>/dev/null || echo "NotRegistered")
     echo "    Feature state: $FEATURE_STATE"
+  done
+  
+  # Refresh the registration
+  az provider register --namespace Microsoft.ContainerService --output none
+fi
+
+# Check if ManagedGPUExperiencePreview feature flag is registered
+GPU_FEATURE_STATE=$(az feature show --namespace Microsoft.ContainerService \
+  --name ManagedGPUExperiencePreview \
+  --query "properties.state" -o tsv 2>/dev/null || echo "NotRegistered")
+
+if [[ "$GPU_FEATURE_STATE" != "Registered" ]]; then
+  echo "  Registering ManagedGPUExperiencePreview feature flag..."
+  az feature register --namespace Microsoft.ContainerService \
+    --name ManagedGPUExperiencePreview --output none
+  
+  echo "  Waiting for GPU feature registration (this may take a few minutes)..."
+  while [[ "$GPU_FEATURE_STATE" != "Registered" ]]; do
+    sleep 30
+    GPU_FEATURE_STATE=$(az feature show --namespace Microsoft.ContainerService \
+      --name ManagedGPUExperiencePreview \
+      --query "properties.state" -o tsv 2>/dev/null || echo "NotRegistered")
+    echo "    GPU Feature state: $GPU_FEATURE_STATE"
   done
   
   # Refresh the registration
@@ -60,7 +96,7 @@ echo ""
 # Configuration - Modify these variables as needed
 # -----------------------------------------------------------------------------
 export RESOURCE_GROUP="${RESOURCE_GROUP:-aks-slurm-rg}"
-export CLUSTER_NAME="${CLUSTER_NAME:-aks-slurm-cluster}"
+export CLUSTER_NAME="${CLUSTER_NAME:-aks-slurm-automatic}"
 export LOCATION="${LOCATION:-uksouth}"
 
 echo "Configuration:"
@@ -70,29 +106,29 @@ echo "  Location:       $LOCATION"
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 1: Create Resource Group and AKS Cluster
+# Step 1: Create Resource Group and AKS Automatic Cluster
 # -----------------------------------------------------------------------------
-echo "Step 1: Creating resource group and AKS cluster..."
+echo "Step 1: Creating resource group and AKS Automatic cluster..."
 
 az group create --name $RESOURCE_GROUP --location $LOCATION --output none
 
-echo "  ✓ Resource group created"
-
-echo "  Creating AKS cluster with Node Auto Provisioning..."
+echo "  Creating AKS Automatic cluster with hosted system node pool..."
 
 az aks create \
   --resource-group $RESOURCE_GROUP \
   --name $CLUSTER_NAME \
   --location $LOCATION \
-  --node-provisioning-mode Auto \
-  --network-plugin azure \
-  --network-plugin-mode overlay \
-  --network-dataplane cilium \
+  --sku automatic \
+  --enable-hosted-system \
   --output none
 
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --overwrite-existing
 
-echo "  ✓ AKS cluster created and credentials configured"
+echo "  ✓ AKS Automatic cluster created and credentials configured"
+
+# Verify cluster nodes
+echo "  Verifying cluster nodes..."
+kubectl get nodes
 
 # -----------------------------------------------------------------------------
 # Step 2: Configure Node Auto Provisioning NodePool for GPUs
@@ -145,7 +181,7 @@ spec:
     EnabledManagedGPUExperience: "true"
 EOF
 
-echo "  ✓ NAP NodePools created"
+echo "  ✓ NAP NodePool created"
 echo "  Note: AKS Managed GPU nodes automatically installs GPU drivers and device plugin"
 
 # Enable DCGM exporter metrics scraping for Azure Monitor
@@ -298,6 +334,9 @@ echo "  ✓ MySQL deployed in cluster"
 # Step 5: Set up shared storage
 # -----------------------------------------------------------------------------
 echo "Step 5: Setting up shared storage..."
+
+# Note: For higher performance workloads, consider using Azure Managed Lustre
+# instead of Azure Files. See: https://learn.microsoft.com/azure/azure-managed-lustre/
 
 kubectl create namespace slurm --dry-run=client -o yaml | kubectl apply -f -
 
@@ -485,6 +524,8 @@ echo ""
 echo "=========================================="
 echo "Deployment Complete!"
 echo "=========================================="
+echo ""
+echo "Cluster type: AKS Automatic with hosted system node pool"
 echo ""
 echo "To connect to Slurm:"
 echo "  kubectl exec -it -n slurm deployment/slurm-login-slinky -- bash"
